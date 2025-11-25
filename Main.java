@@ -1,7 +1,8 @@
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
+
         Scanner sc = new Scanner(System.in);
         StudentService service = new StudentService();
 
@@ -14,12 +15,11 @@ public class Main {
             System.out.println("5. Search by Name");
             System.out.println("6. Display All Students");
             System.out.println("7. Exit");
-            System.out.print("Enter your choice: ");
-
+            System.out.print("Enter choice: ");
             int choice = sc.nextInt();
-            sc.nextLine(); // clear newline
 
             switch (choice) {
+
                 case 1:
                     System.out.print("Enter ID: ");
                     int id = sc.nextInt();
@@ -30,48 +30,62 @@ public class Main {
 
                     System.out.print("Enter Age: ");
                     int age = sc.nextInt();
-                    sc.nextLine();
 
-                    System.out.print("Enter Course: ");
-                    String course = sc.nextLine();
+                    System.out.print("Enter Marks: ");
+                    double marks = sc.nextDouble();
 
-                    service.addStudent(new Student(id, name, age, course));
+                    service.addStudent(new Student(id, name, age, marks));
+                    System.out.println("Student Added.");
                     break;
 
                 case 2:
-                    System.out.print("Enter ID to update: ");
+                    System.out.print("Enter ID to Update: ");
                     int uid = sc.nextInt();
                     sc.nextLine();
 
-                    System.out.print("Enter new name: ");
-                    String newName = sc.nextLine();
+                    System.out.print("Enter New Name: ");
+                    String uname = sc.nextLine();
 
-                    System.out.print("Enter new age: ");
-                    int newAge = sc.nextInt();
-                    sc.nextLine();
+                    System.out.print("Enter New Age: ");
+                    int uage = sc.nextInt();
 
-                    System.out.print("Enter new course: ");
-                    String newCourse = sc.nextLine();
+                    System.out.print("Enter New Marks: ");
+                    double umarks = sc.nextDouble();
 
-                    service.updateStudent(uid, newName, newAge, newCourse);
+                    if (service.updateStudent(uid, uname, uage, umarks))
+                        System.out.println("Student Updated.");
+                    else
+                        System.out.println("Student Not Found.");
                     break;
 
                 case 3:
-                    System.out.print("Enter ID to delete: ");
+                    System.out.print("Enter ID to Delete: ");
                     int did = sc.nextInt();
-                    service.deleteStudent(did);
+                    if (service.deleteStudent(did))
+                        System.out.println("Student Deleted.");
+                    else
+                        System.out.println("Student Not Found.");
                     break;
 
                 case 4:
-                    System.out.print("Enter ID: ");
+                    System.out.print("Enter ID to Search: ");
                     int sid = sc.nextInt();
-                    service.searchById(sid);
+                    Student s = service.searchById(sid);
+                    if (s != null)
+                        System.out.println(s);
+                    else
+                        System.out.println("No Student Found.");
                     break;
 
                 case 5:
                     System.out.print("Enter Name: ");
+                    sc.nextLine();
                     String sname = sc.nextLine();
-                    service.searchByName(sname);
+                    List<Student> list = service.searchByName(sname);
+                    if (list.isEmpty())
+                        System.out.println("No Student Found.");
+                    else
+                        list.forEach(System.out::println);
                     break;
 
                 case 6:
@@ -83,7 +97,7 @@ public class Main {
                     System.exit(0);
 
                 default:
-                    System.out.println("Invalid choice! Try again.");
+                    System.out.println("Invalid Choice!");
             }
         }
     }
