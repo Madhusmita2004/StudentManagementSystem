@@ -1,73 +1,118 @@
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.io.*;
+import java.util.*;
 
 public class StudentService {
 
-    private ArrayList<Student> students = new ArrayList<>();
+    private ArrayList<Student> students;
+
+    public StudentService() {
+        students = new ArrayList<>();
+        loadFromFile();  // Load data at program start
+    }
 
     // Add Student
     public void addStudent(Student s) {
         students.add(s);
-        System.out.println("Student added successfully!");
+        saveToFile();
     }
 
-    // Update Student by ID
-    public void updateStudent(int id, String newName, int newAge, String newCourse) {
+    // Update Student
+    public boolean updateStudent(int id, String name, int age, double marks) {
         for (Student s : students) {
             if (s.getId() == id) {
-                s.setName(newName);
-                s.setAge(newAge);
-                s.setCourse(newCourse);
-                System.out.println("Student updated!");
-                return;
+                s.setName(name);
+                s.setAge(age);
+                s.setMarks(marks);
+                saveToFile();
+                return true;
             }
         }
-        System.out.println("Student not found!");
+        return false;
     }
 
     // Delete Student
-    public void deleteStudent(int id) {
-        Iterator<Student> it = students.iterator();
-        while (it.hasNext()) {
-            if (it.next().getId() == id) {
-                it.remove();
-                System.out.println("Student deleted!");
-                return;
+    public boolean deleteStudent(int id) {
+        Iterator<Student> itr = students.iterator();
+        while (itr.hasNext()) {
+            Student s = itr.next();
+            if (s.getId() == id) {
+                itr.remove();
+                saveToFile();
+                return true;
             }
         }
-        System.out.println("Student not found!");
+        return false;
     }
 
     // Search by ID
-    public void searchById(int id) {
+    public Student searchById(int id) {
         for (Student s : students) {
-            if (s.getId() == id) {
-                System.out.println("Record Found: " + s);
-                return;
-            }
+            if (s.getId() == id) return s;
         }
-        System.out.println("No record found!");
+        return null;
     }
 
     // Search by Name
-    public void searchByName(String name) {
+    public List<Student> searchByName(String name) {
+        List<Student> list = new ArrayList<>();
         for (Student s : students) {
             if (s.getName().equalsIgnoreCase(name)) {
-                System.out.println("Record Found: " + s);
-                return;
+                list.add(s);
             }
         }
-        System.out.println("No record found!");
+        return list;
     }
 
-    // Display all students
+    // Display all
     public void displayAll() {
         if (students.isEmpty()) {
-            System.out.println("No records available!");
+            System.out.println("No records found.");
             return;
         }
         for (Student s : students) {
             System.out.println(s);
+        }
+    }
+
+    // -----------------------------------
+    // FILE HANDLING
+    // -----------------------------------
+
+    // Save data to file
+    private void saveToFile() {
+        try {
+            FileWriter fw = new FileWriter("students.txt");
+            for (Student s : students) {
+                fw.write(s.getId() + "," + s.getName() + "," + s.getAge() + "," + s.getMarks() + "\n");
+            }
+            fw.close();
+        } catch (Exception e) {
+            System.out.println("Error saving file: " + e.getMessage());
+        }
+    }
+
+    // Load data from file
+    private void loadFromFile() {
+        try {
+            File file = new File("students.txt");
+            if (!file.exists()) return;
+
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                int id = Integer.parseInt(data[0]);
+                String name = data[1];
+                int age = Integer.parseInt(data[2]);
+                double marks = Double.parseDouble(data[3]);
+
+                students.add(new Student(id, name, age, marks));
+            }
+
+            br.close();
+        } catch (Exception e) {
+            System.out.println("Error loading file: " + e.getMessage());
         }
     }
 }
